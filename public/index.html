@@ -1,0 +1,89 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    </head>
+    <body>
+        <div style="width: 100%; display: flex;height: 100vh;">
+            <div id="left" style="width: 50%;" class="border border-primary">
+                    <div class="shadow-lg p-3 bg-white rounded" style="display: flex;justify-content: space-between;">
+                        <div>
+                            Main
+                        </div>
+                        <div>
+                            <select class="form-select" aria-label="Default select example" id="lan">
+                                <option selected value="">Language</option>
+                                <option value="java">Java</option>
+                                <option value="js">Javascript</option>
+                                <option value="py">Python</option>
+                              </select>
+                        </div>
+                        <div>
+                            <button onclick="submittextareadata()">
+                                Run
+                            </button>
+                        </div>
+                    </div>
+                    <div style="height: 80%;">
+                        <textarea class="form-control" id="textarea" style="height: -webkit-fill-available;"></textarea>
+                    </div>
+                
+            </div>
+            <div id="right" style="width: 50%;" class="border border-primary">
+                <div class="shadow-lg p-3 bg-white rounded">
+                    Output
+                </div>
+                <div id='content'>
+                    <p style='color:black;'></p>
+                 </div>
+            </div>
+        </div>
+
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        function submittextareadata(){
+            const textareaData = document.getElementById('textarea').value;
+            const language = document.getElementById('lan').value;
+            var div = document.getElementById('content');
+            // var p = document.createElement('p');
+
+            // console.log("lan",language)
+            div.innerHTML = "";
+
+            if(language){
+                // Create a Blob from the textarea data
+                const blob = new Blob([textareaData], { type: 'text/plain' });
+
+                // Create a FormData object to send the Blob as a file
+                const formData = new FormData();
+                formData.append('file', blob, `file_${Date.now()}.${language}`);
+                formData.append('language',language)
+                
+
+                console.log('Sending fetch request to /submittextareadata');
+                // Use Fetch API to send the FormData to the server
+                fetch('/submitfile', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.text())
+                .then(data => {
+                    // console.log(data); // Log the response from the server
+                    div.style.color = 'black';
+                    // div.textContent = data;
+                    // div.appendChild(p);
+                    div.innerHTML = data.replace(/\n/g, '<br>');
+                    // div.innerHTML = data ;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }else{
+                alert("Please select a language");
+            }
+            
+
+        }
+    </script>
+</html>
